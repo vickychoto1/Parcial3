@@ -6,6 +6,124 @@
 @inject Blazored.LocalStorage.ISyncLocalStorageService localStorage
 @inject NavigationManager NavigationManager
 
+<h1>Formulario para agregar Media</h1>
+
+<div class="row mt-3">
+	<div class="col col-6">
+		<label for="tipoMedia">Tipo de Media a Agregar</label>
+		<InputSelect id="tipoMedia" class="form-select" @bind-Value="TipoSeleccionado">
+			<option value="Pelicula">Pelicula</option>
+			<option value="Videojuego">Videojuego</option>
+		</InputSelect>
+	</div>
+</div>
+
+@if (TipoSeleccionado == "Pelicula")
+{
+	pelicula.Tipo = "Pelicula";
+
+	<EditForm Model="@pelicula" OnValidSubmit="@GuardarPelicula">
+		<DataAnnotationsValidator />
+		<ValidationSummary />
+
+		<div class="container">
+			<div class="row mt-3">
+				<div class="col col-2">
+					<label for="titulo" class="form-label">Titulo</label>
+					<InputText id="titulo" class="form-control" @bind-Value="pelicula.Titulo" />
+					<ValidationMessage For="() => pelicula.Titulo" />
+				</div>
+				<div class="col col-4">
+					<label for="director" class="form-label">Director: </label>
+					<InputText id="director" class="form-control" @bind-Value="pelicula.Director" />
+					<ValidationMessage For="() => pelicula.Director" />
+				</div>
+				<div class="col col-6">
+					<label for="genero">Genero: </label>
+					<InputText id="genero" class="form-control" @bind-Value="pelicula.Genero" />
+					<ValidationMessage For="() => pelicula.Genero" />
+				</div>
+
+			</div>
+			<div class="row mt-3">
+				<div class="col">
+					<label for="lanzamiento">Año Lanzamiento: </label>
+					<InputNumber id="lanzamiento" class="form-control" @bind-Value="pelicula.Lanzamiento" />
+					<ValidationMessage For="() => pelicula.Lanzamiento" />
+				</div>
+				<div class="col">
+					<label for="duracion">Duracion: </label>
+					<InputNumber id="duracion" class="form-control" @bind-Value="pelicula.Duracion" />
+					<ValidationMessage For="() => pelicula.Duracion" />
+				</div>
+				<div class="col">
+					<label for="idioma">Idioma: </label>
+					<InputText id="idioma" class="form-control" @bind-Value="pelicula.Idioma" />
+					<ValidationMessage For="() => pelicula.Idioma" />
+				</div>
+			</div>
+			<div class="row mt-3 text-center">
+				<div class="col">
+					<button class="btn btn-secondary" type="submit">Guardar</button>
+				</div>
+			</div>
+		</div>
+
+	</EditForm>
+}
+@if (TipoSeleccionado == "Videojuego")
+{
+	videojuego.Tipo = "Videojuego";
+
+	<EditForm Model="@videojuego" OnValidSubmit="@GuardarVideojuego">
+		<DataAnnotationsValidator />
+		<ValidationSummary />
+
+		<div class="container">
+			<div class="row mt-3">
+				<div class="col col-2">
+					<label for="titulo" class="form-label">Titulo</label>
+					<InputText id="titulo" class="form-control" @bind-Value="videojuego.Titulo" />
+					<ValidationMessage For="() => videojuego.Titulo" />
+				</div>
+				<div class="col col-4">
+					<label for="director" class="form-label">Director: </label>
+					<InputText id="director" class="form-control" @bind-Value="videojuego.Director" />
+					<ValidationMessage For="() => videojuego.Director" />
+				</div>
+				<div class="col col-6">
+					<label for="genero">Genero: </label>
+					<InputText id="genero" class="form-control" @bind-Value="videojuego.Genero" />
+					<ValidationMessage For="() => videojuego.Genero" />
+				</div>
+
+			</div>
+			<div class="row mt-3">
+				<div class="col">
+					<label for="lanzamiento">Año Lanzamiento: </label>
+					<InputNumber id="lanzamiento" class="form-control" @bind-Value="videojuego.Lanzamiento" />
+					<ValidationMessage For="() => videojuego.Lanzamiento" />
+				</div>
+				<div class="col">
+					<label for="plataforma">Plataforma: </label>
+					<InputText id="plataforma" class="form-control" @bind-Value="videojuego.Plataforma" />
+					<ValidationMessage For="() => videojuego.Plataforma" />
+				</div>
+				<div class="col">
+					<label for="peso">Peso: </label>
+					<InputNumber id="peso" class="form-control" @bind-Value="videojuego.Peso" />
+					<ValidationMessage For="() => videojuego.Peso" />
+				</div>
+			</div>
+			<div class="row mt-3 text-center">
+				<div class="col">
+					<button class="btn btn-secondary" type="submit">Guardar</button>
+				</div>
+			</div>
+		</div>
+
+	</EditForm>
+}
 @code {
 	private string TipoSeleccionado = "Pelicula";
 
@@ -18,4 +136,47 @@
 	private Videojuego videojuego = new Videojuego();
 	private List<Videojuego> videojuegos = new List<Videojuego>();
 
+	private Media ConvertirAMediaBase(Media mediaEspecifica)
+	{
+		return new Media
+		{
+			Titulo = mediaEspecifica.Titulo,
+			Director = mediaEspecifica.Director,
+			Genero = mediaEspecifica.Genero,
+			Lanzamiento = mediaEspecifica.Lanzamiento
+		};
+	}
+
+	private void GuardarPelicula()
+	{
+		peliculas.Add(pelicula);
+
+		var mediaBase = ConvertirAMediaBase(pelicula);
+		medias.Add(mediaBase);
+
+		localStorage.SetItem("archivo_peliculas", peliculas);
+		localStorage.SetItem("archivo_media", medias);
+
+		NavigationManager.NavigateTo("/listado-peliculas");
+	}
+
+	private void GuardarVideojuego()
+	{
+		videojuegos.Add(videojuego);
+
+		var mediaBase = ConvertirAMediaBase(videojuego);
+		medias.Add(mediaBase);
+
+		localStorage.SetItem("archivo_videojuegos", videojuegos);
+		localStorage.SetItem("archivo_media", medias);
+
+		NavigationManager.NavigateTo("/listado-videojuegos");
+	}
+
+	protected override void OnInitialized()
+	{
+		videojuegos = localStorage.GetItem<List<Videojuego>>("archivo_videojuegos") ?? new();
+		peliculas = localStorage.GetItem<List<Pelicula>>("archivo_peliculas") ?? new();
+		medias = localStorage.GetItem<List<Media>>("archivo_media") ?? new();
+	}
 }
